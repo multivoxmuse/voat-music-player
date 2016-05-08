@@ -12,6 +12,18 @@
 # end
 # Rack::Handler::WEBrick.run app
 
+require 'json'
+
+$voat_api = "https://voat.co/api/"
+$voat_endpoints = {
+  "subverse_frontpage" => "subversefrontpage?subverse=%{subverse}"
+}
+
+def remove_trailing_slashes!(s)
+  s = s.slice!(s)
+  return s
+end
+
 class MyApp
   attr_reader :request
 
@@ -30,12 +42,10 @@ class MyApp
   end
 
   def headers
-    {'Content-Type' => 'text/html', 'Content-Length' => body.size.to_s}
+    {'Content-Type' => 'application/json', 'Content-Length' => body.size.to_s}
   end
 
   def body
-    content = if homepage?
-      "Your IP: #{request.ip}\nYour request was to #{request.path_info}"
     elsif api_request?
       get_json
     else
@@ -55,25 +65,26 @@ class MyApp
     request.path_info =~ /^\/api\/v1/
   end
 
+  def get_api_path
+    if api_request?
+      return request.path_info.partition("/api/v2/").last
+    end
+  end
+
   def get_json
-    request.query_string
+    Unirest.get("#{$voat_api}#{voat_endpoints['subverse_frontpage']}" % {:subverse => get_path})
   end
 
-  def layout(content)
-%{<!DOCTYPE html>
-<html lang="en">
-  <head>
-
-    <meta charset="utf-8">
-    <title>Your IP</title>
-  </head>
-  <body>
-    <h1>Rack server</h1>
-    #{content}
-  </body>
-</html>}
+  def load_cache
+    JSON.parse(File.read("/tmp/cache/voat-music/#{request.path_info}/cache.json"))
   end
-end
+
+  def save_cache
+    File.open("/tmp/cache/voat-music/#{request.path_info}/cache.json", "w") do |cache|
+      cache.write(
+    end
+  end
+
 
 class MyApp::Rack
   def call(env)
