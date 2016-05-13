@@ -22,12 +22,20 @@
 </head>
 
 <body>
-  <h1>Voat Music Player</h1>
-  <div class="container-fluid">
-    <div v-for="post in posts" class="row">
-      {{ post.MessageContent }}
+  <div id="posts" class="container">
+    <div class="row">
+      <h1 style="display:inline">Voat Music Player</h1><h1 style="display:inline"><span class="label label-info">Page {{ currentPage }}</span></h1>
+    </div>
+    <div style="display:initial" class="row"></div>
+    <div class="row">
+      <button id="prevPage" class="btn btn-default">Prev</button>
+      <button id="nextPage" class="btn btn-primary">Next</button>
+      <h3><span class="label label-default">{{ bannerMsg }}</span></h3>
+    </div>
+    <div class="row" v-for="post in posts">
+      <h3>{{ post.Linkdescription }}</h3>
       <div class="col-md-6">
-        <iframe width="200" height="100" 
+        <iframe width="600" height="250" 
           v-bind:src="post.MessageContent"
           frameborder="0"
           allowfullscreen>
@@ -35,10 +43,5 @@
       </div>
     </div>
   </div>
-  <ul id="posts">
-    <li v-for="post in posts">
-      {{ post.MessageContent }}
-    </li>
-  </ul>
 </body>
 </html>
