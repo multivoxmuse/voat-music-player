@@ -1,5 +1,5 @@
 #\ -w -p 8080
-## Simple backend for the voat music player
+# Simple backend for the voat music player
 
 require 'json'
 require 'unirest'
