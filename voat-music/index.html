@@ -28,9 +28,10 @@
       <h3 class="pull-right"><span id="pageNum" class="label label-info">Page {{ currentPage }}</span><h3>
       <h1>Voat Music Player</h1>    
     </div>
-    <div style="display:initial" class="row"></div>
-    <input id="submitSearch" type="text" v-model="subverse" placeholder="music"></input>
-    <button id="goBtn" class="btn btn-default">go</button>
+    <div class="row">
+      <div class="space-rt label label-default">/v/</div><input id="submitSearch" type="text" v-model="subverse" placeholder="music"></input>
+      <button id="goBtn" class="btn btn-default">go</button>
+    </div>
     <div class="row">
       <button id="prevPageTop" class="btn btn-default">Prev</button>
       <button id="nextPageTop" class="pull-right btn btn-primary">Next</button>

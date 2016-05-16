@@ -15,5 +15,8 @@ Create a site that aggregates and makes available for streaming, posts to voats 
 - The `load_cache_or_fetch` method will load from the cache. Otherwise, change the code to use the voat api function instead of loading from cache! 
 
 ## To do
+
+- Use `GET api/submissioncomments?submissionId={submissionId}` to show the comment count
 - Make it easier to deploy
 - Use the new voat api (2016)
+
