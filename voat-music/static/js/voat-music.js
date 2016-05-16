@@ -1,10 +1,5 @@
 $(document).ready(function(){
-  var VoatAPI = "https://voat.co/api/subversefrontpage?subverse=music"
-  var dataUrl = "http://vp.music-data.ir:9001/api/v1/voat/subverses/music/"
-
-  var getyturl = {
-    yturl: 'https://www.youtube.com/embed/wyPfrbJKMpg'
-  }
+  var dataUrl = "http://vp.music-data.ir:9001/api/v1/voat/subverses/"
 
   nextPage = function () {
     postvue.currentPage = postvue.currentPage + 1;
@@ -16,16 +11,20 @@ $(document).ready(function(){
   }
   
   getPosts = function () {
+    postvue.bannerMsg = "";
+    $("#pageNum").hide();
+    $("#loadingIcon").show();
     $.ajax({
       url: dataUrl,
       type: 'GET',
       data: {
         limit: postvue.itemsPerPage, 
-        start: (postvue.currentPage - 1 ) * postvue.itemsPerPage 
+        start: (postvue.currentPage - 1 ) * postvue.itemsPerPage,
+        subverse: postvue.subverse,
       },
       dataType: 'json',
-      success: function(data) { postvue.posts = data; },
-      error: function() { postvue.bannerMsg = "There was a problem loading the music... try again"; },
+      success: function(data) { postvue.posts = data; $("#loadingIcon").hide(); $("#pageNum").show();},
+      error: function() { postvue.bannerMsg = "There was a problem loading the music... try again"; $("#loadingIcon").hide(); $("#pageNum").show(); },
       beforeSend: function(xhr){ 
         xhr.setRequestHeader("Content-Type","application/json");
         xhr.setRequestHeader("Accept","application/json");
@@ -40,11 +39,21 @@ $(document).ready(function(){
       currentPage: 1,
       itemsPerPage: 4,
       bannerMsg: "",
+      subverse: "music"
     },
   });
   
   // On first page load, do ajax
   getPosts();
-  $("#nextPage").click(function(){ nextPage(); });
-  $("#prevPage").click(function(){ prevPage(); });
+  $("#nextPageTop").click(function(){ nextPage(); });
+  $("#prevPageTop").click(function(){ prevPage(); });
+  $("#nextPageBottom").click(function(){ nextPage(); });
+  $("#prevPageBottom").click(function(){ prevPage(); });
+  $("#goBtn").click(function(){ postvue.currentPage = 1; getPosts(); });
+  $("#submitSearch").keyup(function (e) {
+    if (e.keyCode == 13) {
+      postvue.currentPage = 1;
+      getPosts();
+  }});
+  
 });

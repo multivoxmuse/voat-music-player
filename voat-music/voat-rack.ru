@@ -10,7 +10,7 @@ $api_version = 'v1'
 
 $voat_api = "https://voat.co/api/"
 $voat_endpoints = [
-  {"url" => "subversefrontpage?subverse=music", "path" => "voat/subverses/music/"}
+  {"url" => "subversefrontpage", "path" => "voat/subverses/"},
 ]
 
 class MyApp
@@ -28,7 +28,7 @@ class MyApp
 
   def status
     # Return a status code
-    if @body
+    if @body.length > 1
       200
     else
       400
@@ -47,8 +47,12 @@ class MyApp
 
   def voat_get_api
     # Do a get from the voat api where the request matches a list of approved types
-    voat_url = $voat_endpoints.select {|e| e['path'] == get_api_path}[0]['url']
-    Unirest.get("#{$voat_api}#{voat_url}").body
+    return nil unless request.params.include?('subverse')
+    voat_endpoint = $voat_endpoints.select {|e| e['path'] == get_api_path}[0]
+    voat_url = voat_endpoint['url'] + '?subverse=' + request.params['subverse']
+    resp = Unirest.get("#{$voat_api}#{voat_url}").body
+    return nil unless resp
+    resp
   end
   
   private
@@ -61,7 +65,7 @@ class MyApp
   def get_api_path
     # Get the "path" the consumer is requesting from the API (strip the api and version from the request path)
     if api_request?
-      return request.path_info.partition("/api/#{$api_version}/").last
+      return request.path_info.partition("/api/#{$api_version}/").last.downcase
     end
   end
 
@@ -79,7 +83,10 @@ class MyApp
   def get_json
     # Get the json from the voat api 
     post_limit, post_start = nil
-    jsons = load_cache_or_fetch.select {|p| p['MessageContent'] =~ /youtube\.com/}
+    # Limiting to youtube posts, filtering out /channel/ links.
+    jsons = load_cache_or_fetch
+    return "" unless jsons.class == Array
+    jsons = jsons.select {|p| p['MessageContent'] =~ /youtube\.com\/watch/}.select {|p| p['MessageContent'] !~ /youtube\.com\/channel/}.select {|p| p['Type'] == 2}
     if request.params.include?('limit')
       post_limit = request.params['limit'].to_i
     end
